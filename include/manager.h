@@ -1,48 +1,14 @@
-#include <cstddef>
-#include <iostream>
 #include <memory>
-#include <vector>
+#include "isorter.h"
 
 #ifndef MANAGER_H
 #define MANAGER_H
 
-/**
- * @brief The ISorter class.
- * Interface for Sort algorithms. Uses CRTP pattern instead of virtual functions.
- */
-template<typename Derived>
-class ISorter
-{};
-
-/**
- * @brief The QSorter class.
- * Implements Quick Sort algorithm.
- */
-class QSorter : public ISorter<QSorter>
-{
-public:
-    QSorter() { std::cout << "QSorter default ctor" << std::endl; }
-};
-
-class DataChunk
-{};
-
-/**
- * @brief The DataObject class.
- * Resposibility: handle raw input data to be sorted (from file, stdin, etc.)
- */
-class DataObject
-{
-    std::size_t size;
-    std::vector<DataChunk> d_chunk_vec;
-};
-
-
-template<typename Sorter>
+template<typename Sorter, typename Receiver>
 class Manager
 {
     std::unique_ptr<ISorter<Sorter>> sorter_uptr;
-    DataObject d_obj;
+    IDataSource<Receiver> d_obj;
 
 public:
     Manager()
