@@ -2,6 +2,6 @@
 
 int main()
 {
-    Manager<QSorter, FileDataSource> mng; //Choose sorting algorithm here
+    Manager<QuickSorter, FileDataSource> mng; //Choose sorting algorithm here
     return 0;
 }

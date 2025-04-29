@@ -12,3 +12,8 @@ SOURCES += \
 HEADERS += \
     include/manager.h \
     include/sorters/isorter.h
+
+DISTFILES += \
+    .gitignore \
+    CMakeLists.txt \
+    README.md

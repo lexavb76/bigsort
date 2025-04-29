@@ -2,6 +2,7 @@ build/
 *.pro
 *.pro.user
 *.o
+*.uml.dia
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles

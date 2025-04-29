@@ -14,13 +14,13 @@ class ISorter
 {};
 
 /**
- * @brief The QSorter class.
+ * @brief The QuickSorter class.
  * Implements Quick Sort algorithm.
  */
-class QSorter : public ISorter<QSorter>
+class QuickSorter : public ISorter<QuickSorter>
 {
 public:
-    QSorter() { std::cout << "QSorter default ctor" << std::endl; }
+    QuickSorter() { std::cout << "QSorter default ctor" << std::endl; }
 };
 
 class DataChunk
