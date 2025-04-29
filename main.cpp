@@ -1,9 +1,7 @@
-#include <iostream>
-
-using namespace std;
+#include "manager.h"
 
 int main()
 {
-    cout << "Hello World!" << endl;
+    Manager<QSorter> mng; //Choose sorting algorithm here
     return 0;
 }
