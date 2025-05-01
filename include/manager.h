@@ -1,18 +1,23 @@
+#include "data_source.h"
 #include <memory>
-#include "isorter.h"
 
 #ifndef MANAGER_H
 #define MANAGER_H
 
-template<typename Sorter, typename Receiver>
+template<typename Sorter,
+         typename Data = FileDataSource>
 class Manager
 {
-    std::unique_ptr<ISorter<Sorter>> sorter_uptr;
-    IDataSource<Receiver> d_obj;
+    const char *source_name;
+    std::unique_ptr<Sorter> sorter_uptr;
+    Data d_obj;
 
 public:
-    Manager()
-        : sorter_uptr(std::make_unique<Sorter>())
+    Manager(const char *src)
+        : source_name(src),
+          sorter_uptr(std::make_unique<Sorter>()),
+          d_obj(source_name)
+
     {
         std::cout << "Manager default ctor" << std::endl;
     }

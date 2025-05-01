@@ -4,12 +4,14 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 INCLUDEPATH += include \
-    include/sorters
+    include/sorters \
+    include/data_source_handlers
 
 SOURCES += \
         main.cpp
 
 HEADERS += \
+    include/data_source_handlers/data_source.h \
     include/manager.h \
     include/sorters/isorter.h
 
