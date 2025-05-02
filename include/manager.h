@@ -19,7 +19,7 @@ public:
           d_obj(source_name)
 
     {
-        std::cout << "Manager default ctor" << std::endl;
+        std::cerr << "Manager default ctor" << std::endl;
     }
 };
 

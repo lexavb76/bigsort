@@ -12,16 +12,19 @@ using std::endl;
  */
 template<typename Derived>
 class ISorter
-{};
+{
+protected:
+    ~ISorter() {} // Protected Dtor to avoid unexpected deletion through base class pointer
+};
 
 /**
  * @brief The QuickSorter class.
  * Implements Quick Sort algorithm.
  */
-class QuickSorter : public ISorter<QuickSorter>
+class QuickSorter final : public ISorter<QuickSorter>
 {
 public:
-    QuickSorter() { std::cout << "QSorter default ctor" << std::endl; }
+    QuickSorter() { std::cerr << "QSorter default ctor" << std::endl; }
 };
 
 
