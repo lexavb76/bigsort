@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <ios>
 #include <iostream>
 #include <limits>
 #include <random>
@@ -23,7 +24,7 @@ int main()
     cerr << uf_dis.min() << " - " << uf_dis.max() << endl;
 
     for (int i = 1; i < 257; ++i) {
-        of << std::hex << std::setw(1) << std::setfill('0') << uf_dis(gen) << endl;
+        of << std::noskipws << std::hex << std::setw(1) << std::setfill('0') << '\"' << uf_dis(gen)<< "    Alex!!!\"" << endl;
 //        if (i % 16 == 0) {
 //            of << std::hex << '\n';
 //        }

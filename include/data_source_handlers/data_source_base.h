@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
+#include <ios>
 #include <iostream>
 #include <iterator>
 #include <memory>
@@ -28,36 +29,62 @@ using dSortedContPtr = std::shared_ptr<std::multiset<T, Compare>>; // Multiset k
 constexpr std::size_t CHUNK_SIZE_MAX = 1024 * 1024 * 100;
 constexpr std::size_t CHUNK_SIZE_OPT = 16 * 16 * 4 * 3;
 
+template<typename ItFirst, typename ItSec>
+class IterWrapper
+{
+    ItFirst it_f_;
+    ItSec it_s_;
+    bool swap_;
+
+public:
+    IterWrapper(const ItFirst &it_f, const ItSec &it_s, bool swap)
+        : it_f_(it_f)
+        , it_s_(it_s)
+        , swap_(swap)
+    { }
+
+    decltype(auto) operator*() const { return *it_f_; }
+    decltype(auto) operator->() const { return it_f_; }
+    decltype(auto) operator++() { return ++it_f_; }
+    bool operator!=(const IterWrapper<ItFirst, ItSec> &other){}
+
+};
+
+#if 0 // Deduction guide example
+template<typename ItFirst, typename ItSec>
+IterWrapper(ItFirst, ItSec, bool) -> IterWrapper<ItFirst, ItSec>;
+#endif
+
 template<typename T = std::string>
 class DataChunk
 {
     constexpr static int FNAME_LEN = 18;
     constexpr static int FEXT_LEN = 8;
-    bool swap_to_file;
-    char swap_f_name[FNAME_LEN] = ".bigsort.tmp.xxxx";
-    std::unique_ptr<std::ifstream> is_p;
-    std::unique_ptr<std::ofstream> os_p;
-    dSortedContPtr<T> data_sorted_p;
+    bool swap_to_file_;
+    char swap_f_name_[FNAME_LEN] = ".bigsort.tmp.xxxx";
+    std::unique_ptr<std::ifstream> is_p_;
+    dSortedContPtr<T> data_sorted_p_;
 
 public:
-    explicit DataChunk(dSortedContPtr<T> data, bool swap_to_file = false)
-        : data_sorted_p(data)
+    explicit DataChunk(dSortedContPtr<T> data, bool swap_to_file = true)
+        : data_sorted_p_(data)
     {
-        if (swap_to_file && data_sorted_p->size()) {
+        std::unique_ptr<std::ofstream> os_p;
+        if (swap_to_file && data_sorted_p_->size()) {
             std::random_device seed;
             std::mt19937 gen(seed());
             std::uniform_int_distribution<char> uf_dis('A', 'Z');
             for (int i = FNAME_LEN - FEXT_LEN - 1; i < FNAME_LEN - 1; ++i) {
-                swap_f_name[i] = uf_dis(gen);
+                swap_f_name_[i] = uf_dis(gen);
             }
             os_p = std::make_unique<std::ofstream>(
-                swap_f_name); // Move tmp object to osPtr as unique_ptr does not have copy Ctor
+                swap_f_name_); // Move tmp object to osPtr as unique_ptr does not have copy Ctor
             std::for_each(begin(), end(),
-                          [&os=os_p](const T &str) { (*os) << str << endl; }
+                          [&os=os_p](const T &str) { (*os) << std::noskipws << str << endl; }
                           );
             os_p->close();
-            if (!fs::exists(swap_f_name))
-                throw(fs::filesystem_error((std::stringstream{} << "File '" << swap_f_name << "' was not created.").str(),
+            if (!fs::exists(swap_f_name_))
+                throw(fs::filesystem_error((std::stringstream{} << "File '" << swap_f_name_ << "' was not created.").str(),
                                            std::make_error_code(std::errc::io_error)));
         }
     }
@@ -67,8 +94,14 @@ public:
     }
 #endif
 
-    auto begin() { return data_sorted_p->begin(); }
-    auto end() { return data_sorted_p->end(); }
+    auto begin()
+    {
+        return IterWrapper(std::istream_iterator<T>(*is_p_), data_sorted_p_->begin(), swap_to_file_);
+    }
+    auto end()
+    {
+        return IterWrapper(std::istream_iterator<T>(), data_sorted_p_->end(), swap_to_file_);
+    }
 };
 
 /**
