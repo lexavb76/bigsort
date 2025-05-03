@@ -21,7 +21,7 @@ protected:
  * @brief The QuickSorter class.
  * Implements Quick Sort algorithm.
  */
-class QuickSorter final : public ISorter<QuickSorter>
+class QuickSorter : public ISorter<QuickSorter>
 {
 public:
     QuickSorter() { std::cerr << "QSorter default ctor" << std::endl; }
