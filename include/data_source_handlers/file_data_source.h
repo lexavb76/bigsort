@@ -2,12 +2,9 @@
 #define FILE_DATA_SOURCE_H
 
 #include <string_view>
-#include <filesystem>
 #include <fstream>
 #include <ios>
 #include "data_source_base.h"
-
-namespace fs = std::filesystem;
 
 class FileDataSource : public DataSourceBase<FileDataSource>
 {
@@ -15,11 +12,12 @@ class FileDataSource : public DataSourceBase<FileDataSource>
     void divide_to_chunks(const InIter &first, const InIter &last)
     {
         std::size_t size_acc = 0;
-        dVecUptr<> tmp_vec(new dVecUptr<>::element_type);
+        bool need_to_swap_chunk_to_file = true;
+        dSortedContPtr<> tmp_vec(new dSortedContPtr<>::element_type);
         for (auto it = first; it != last; ++it) {
             size_acc += it->length() + 1;
             if (size_acc > chunk_size) {
-                d_chunk_vec.emplace_back(tmp_vec);
+                d_chunk_vec.emplace_back(tmp_vec, need_to_swap_chunk_to_file);
 #if 0
                 for (auto &&it : d_chunk_vec) {
                     for (auto i = it.begin(), end = it.end(); i != end; ++i)
@@ -27,12 +25,12 @@ class FileDataSource : public DataSourceBase<FileDataSource>
                 }
                 cerr << "----> " << size_acc << endl;
 #endif
-                tmp_vec = dVecUptr<>(new dVecUptr<>::element_type);
+                tmp_vec = dSortedContPtr<>(new dSortedContPtr<>::element_type);
                 size_acc = 0;
             }
-            tmp_vec->push_back(*it);
+            tmp_vec->insert(*it);
         }
-        d_chunk_vec.emplace_back(tmp_vec); // Store the last incomplete chunk
+        d_chunk_vec.emplace_back(tmp_vec, need_to_swap_chunk_to_file); // Store the last incomplete chunk
     }
 
 public:
