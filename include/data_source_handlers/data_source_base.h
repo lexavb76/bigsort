@@ -23,37 +23,44 @@ using std::cerr;
 using std::endl;
 using isIter = std::istream_iterator<std::string>;
 
+class ISortedCont
+{
+public:
+    virtual ~ISortedCont() {}
+};
+
 template<typename T = std::string, typename Compare = std::less<T>>
 using dSortedContPtr = std::shared_ptr<std::multiset<T, Compare>>; // Multiset keeps its data sorted
 
 constexpr std::size_t CHUNK_SIZE_MAX = 1024 * 1024 * 100;
 constexpr std::size_t CHUNK_SIZE_OPT = 16 * 16 * 4 * 3;
 
-template<typename ItFirst, typename ItSec>
-class IterWrapper
+template<typename T, typename U>
+class IterSwitch
 {
-    ItFirst it_f_;
-    ItSec it_s_;
-    bool swap_;
+    T *it_first_p = nullptr;
+    U *it_sec_p   = nullptr;
 
 public:
-    IterWrapper(const ItFirst &it_f, const ItSec &it_s, bool swap)
-        : it_f_(it_f)
-        , it_s_(it_s)
-        , swap_(swap)
-    { }
-
-    decltype(auto) operator*() const { return *it_f_; }
-    decltype(auto) operator->() const { return it_f_; }
-    decltype(auto) operator++() { return ++it_f_; }
-    bool operator!=(const IterWrapper<ItFirst, ItSec> &other){}
-
+    explicit IterSwitch(T it) { it_first_p = new T(it); }
+    explicit IterSwitch(U it) { it_sec_p   = new U(it); }
+    ~IterSwitch()
+    {
+        delete it_first_p;
+        delete it_sec_p;
+    }
+    decltype(auto) operator*()  const { return it_first_p ? *(*it_first_p) : *(*it_sec_p); }
+    decltype(auto) operator->() const { return it_first_p ?  (*it_first_p) :  (*it_sec_p); }
+    IterSwitch &operator++()
+    {
+        if (it_first_p)
+            ++(*it_first_p);
+        else
+            ++(*it_sec_p);
+        return *this;
+    }
+    bool operator!=(const IterSwitch &other) const { return  it_first_p ?  (*it_first_p != *other.it_first_p) :  (*it_sec_p != *other.it_sec_p);  }
 };
-
-#if 0 // Deduction guide example
-template<typename ItFirst, typename ItSec>
-IterWrapper(ItFirst, ItSec, bool) -> IterWrapper<ItFirst, ItSec>;
-#endif
 
 template<typename T = std::string>
 class DataChunk
@@ -63,29 +70,32 @@ class DataChunk
     bool swap_to_file_;
     char swap_f_name_[FNAME_LEN] = ".bigsort.tmp.xxxx";
     std::unique_ptr<std::ifstream> is_p_;
-    dSortedContPtr<T> data_sorted_p_;
+    dSortedContPtr<> data_sorted_p_;
 
 public:
-    explicit DataChunk(dSortedContPtr<T> data, bool swap_to_file = true)
+    explicit DataChunk(dSortedContPtr<> data, bool swap_to_file = true)
         : data_sorted_p_(data)
     {
         std::unique_ptr<std::ofstream> os_p;
         if (swap_to_file && data_sorted_p_->size()) {
+            // Generate unique tmp file name:
             std::random_device seed;
             std::mt19937 gen(seed());
             std::uniform_int_distribution<char> uf_dis('A', 'Z');
             for (int i = FNAME_LEN - FEXT_LEN - 1; i < FNAME_LEN - 1; ++i) {
                 swap_f_name_[i] = uf_dis(gen);
             }
+            // ***
             os_p = std::make_unique<std::ofstream>(
-                swap_f_name_); // Move tmp object to osPtr as unique_ptr does not have copy Ctor
-            std::for_each(begin(), end(),
+                swap_f_name_); // Move tmp object as unique_ptr does not have copy Ctor
+            std::for_each(data_sorted_p_->begin(), data_sorted_p_->end(),
                           [&os=os_p](const T &str) { (*os) << std::noskipws << str << endl; }
                           );
             os_p->close();
             if (!fs::exists(swap_f_name_))
                 throw(fs::filesystem_error((std::stringstream{} << "File '" << swap_f_name_ << "' was not created.").str(),
                                            std::make_error_code(std::errc::io_error)));
+            data_sorted_p_->clear();
         }
     }
 
@@ -96,11 +106,17 @@ public:
 
     auto begin()
     {
-        return IterWrapper(std::istream_iterator<T>(*is_p_), data_sorted_p_->begin(), swap_to_file_);
+        return swap_to_file_ ? IterSwitch<std::istream_iterator<T>, decltype(data_sorted_p_->begin())>
+                   (std::istream_iterator<T>(*is_p_))
+                             : IterSwitch<std::istream_iterator<T>, decltype(data_sorted_p_->begin())>
+                   (data_sorted_p_->begin());
     }
     auto end()
     {
-        return IterWrapper(std::istream_iterator<T>(), data_sorted_p_->end(), swap_to_file_);
+        return swap_to_file_ ? IterSwitch<std::istream_iterator<T>, decltype(data_sorted_p_->end())>
+                   (std::istream_iterator<T>())
+                             : IterSwitch<std::istream_iterator<T>, decltype(data_sorted_p_->end())>
+                   (data_sorted_p_->end());
     }
 };
 
@@ -117,7 +133,7 @@ protected:
     std::vector<DataChunk<>> d_chunk_vec;
 
 protected:
-    DataSourceBase() {} // Protected Ctor to avoid unexpected base class instantiation
+    DataSourceBase()  {} // Protected Ctor to avoid unexpected base class instantiation
     ~DataSourceBase() {} // Protected Dtor to avoid unexpected deletion through base class pointer
     std::size_t calculate_chunk_size()
     {

@@ -12,12 +12,12 @@ class FileDataSource : public DataSourceBase<FileDataSource>
     void divide_to_chunks(const InIter &first, const InIter &last)
     {
         std::size_t size_acc = 0;
-        bool need_to_swap_chunk_to_file = true;
+        bool swap_chunk_to_file = false;
         dSortedContPtr<> tmp_vec(new dSortedContPtr<>::element_type);
         for (auto it = first; it != last; ++it) {
             size_acc += it->length() + 1;
             if (size_acc > chunk_size) {
-                d_chunk_vec.emplace_back(tmp_vec, need_to_swap_chunk_to_file);
+                d_chunk_vec.emplace_back(tmp_vec, swap_chunk_to_file);
 #if 0
                 for (auto &&it : d_chunk_vec) {
                     for (auto i = it.begin(), end = it.end(); i != end; ++i)
@@ -30,7 +30,7 @@ class FileDataSource : public DataSourceBase<FileDataSource>
             }
             tmp_vec->insert(*it);
         }
-        d_chunk_vec.emplace_back(tmp_vec, need_to_swap_chunk_to_file); // Store the last incomplete chunk
+        d_chunk_vec.emplace_back(tmp_vec, swap_chunk_to_file); // Store the last incomplete chunk
     }
 
 public:
