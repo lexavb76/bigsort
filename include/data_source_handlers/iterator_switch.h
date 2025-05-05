@@ -10,8 +10,8 @@ class IterSwitch
     std::unique_ptr<U> it_sec_p   = nullptr;
 
 public:
-    explicit IterSwitch(T it) { it_first_p = make_unique<T>(it); }
-    explicit IterSwitch(U it) { it_sec_p   = make_unique<U>(it); }
+    explicit IterSwitch(T it) { it_first_p = std::make_unique<T>(it); }
+    explicit IterSwitch(U it) { it_sec_p   = std::make_unique<U>(it); }
     decltype(auto) operator*()  const { return it_first_p ? *(*it_first_p) : *(*it_sec_p); }
     decltype(auto) operator->() const { return it_first_p ?  (*it_first_p) :  (*it_sec_p); }
     IterSwitch &operator++()

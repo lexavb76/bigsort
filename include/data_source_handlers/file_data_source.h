@@ -11,28 +11,21 @@ using isIter = std::istream_iterator<std::string>;
 class FileDataSource : public DataSourceBase<FileDataSource>
 {
     template<typename InIter>
-    void divide_to_chunks(const InIter &first, const InIter &last)
+    void divide_to_chunks(InIter first, const InIter &last)
     {
         std::size_t size_acc = 0;
         bool swap_chunk_to_file = true;
-        dSortedContPtr<> tmp_vec(new dSortedContPtr<>::element_type);
-        for (auto it = first; it != last; ++it) {
-            size_acc += it->length() + 1;
+        dSortedContPtr<> tmp_chunk(new dSortedContPtr<>::element_type);
+        for (; first != last; ++first) {
+            size_acc += first->length() + 1;
             if (size_acc > chunk_size) {
-                d_chunk_vec.emplace_back(tmp_vec, swap_chunk_to_file);
-#if 0
-                for (auto &&it : d_chunk_vec) {
-                    for (auto i = it.begin(), end = it.end(); i != end; ++i)
-                        cerr << *i << endl;
-                }
-                cerr << "----> " << size_acc << endl;
-#endif
-                tmp_vec = dSortedContPtr<>(new dSortedContPtr<>::element_type);
+                d_chunk_vec.emplace_back(tmp_chunk, swap_chunk_to_file);
+                tmp_chunk = dSortedContPtr<>(new dSortedContPtr<>::element_type);
                 size_acc = 0;
             }
-            tmp_vec->insert(*it);
+            tmp_chunk->insert(*first);
         }
-        d_chunk_vec.emplace_back(tmp_vec, swap_chunk_to_file); // Store the last incomplete chunk
+        d_chunk_vec.emplace_back(tmp_chunk, swap_chunk_to_file); // Store the last incomplete chunk
     }
 
 public:
@@ -40,7 +33,6 @@ public:
         : DataSourceBase<FileDataSource>{fs::file_size(fname)}
     {
         std::ifstream is(fname.data());
-        std::string str;
         auto is_begin = isIter(is);
         auto is_end   = isIter();
         cerr << fname << std::boolalpha << ' ' << is.fail() << endl;
