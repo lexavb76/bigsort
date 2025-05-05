@@ -1,20 +1,17 @@
 #ifndef ITERATOR_SWITCH_H
 #define ITERATOR_SWITCH_H
 
+#include <memory>
+
 template<typename T, typename U>
 class IterSwitch
 {
-    T *it_first_p = nullptr;
-    U *it_sec_p   = nullptr;
+    std::unique_ptr<T> it_first_p = nullptr;
+    std::unique_ptr<U> it_sec_p   = nullptr;
 
 public:
-    explicit IterSwitch(T it) { it_first_p = new T(it); }
-    explicit IterSwitch(U it) { it_sec_p   = new U(it); }
-    ~IterSwitch()
-    {
-        delete it_first_p;
-        delete it_sec_p;
-    }
+    explicit IterSwitch(T it) { it_first_p = make_unique<T>(it); }
+    explicit IterSwitch(U it) { it_sec_p   = make_unique<U>(it); }
     decltype(auto) operator*()  const { return it_first_p ? *(*it_first_p) : *(*it_sec_p); }
     decltype(auto) operator->() const { return it_first_p ?  (*it_first_p) :  (*it_sec_p); }
     IterSwitch &operator++()

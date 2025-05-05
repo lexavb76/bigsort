@@ -14,7 +14,7 @@ class FileDataSource : public DataSourceBase<FileDataSource>
     void divide_to_chunks(const InIter &first, const InIter &last)
     {
         std::size_t size_acc = 0;
-        bool swap_chunk_to_file = false;
+        bool swap_chunk_to_file = true;
         dSortedContPtr<> tmp_vec(new dSortedContPtr<>::element_type);
         for (auto it = first; it != last; ++it) {
             size_acc += it->length() + 1;
