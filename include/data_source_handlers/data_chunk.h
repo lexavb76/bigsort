@@ -1,5 +1,6 @@
 #ifndef DATA_CHUNK_H
 #define DATA_CHUNK_H
+#include <cstring>
 #include <random>
 #include <sstream>
 #include <algorithm>
@@ -32,7 +33,7 @@ class DataChunk
     constexpr static int FEXT_LEN = 8;
     bool swap_to_file_;
     char swap_f_name_[FNAME_LEN] = ".bigsort.tmp.xxxx";
-    std::unique_ptr<std::ifstream> is_p_ = nullptr;
+    std::shared_ptr<std::ifstream> is_p_ = nullptr;
     dSortedContPtr<> data_sorted_p_;
 
 public:
@@ -68,6 +69,25 @@ public:
 #endif
         }
     }
+
+    DataChunk(const DataChunk &other)
+        : swap_to_file_(other.swap_to_file_)
+        , is_p_(other.is_p_)
+        , data_sorted_p_(other.data_sorted_p_)
+    {
+        cerr << "DataChunk copy Ctor. data size = " << data_sorted_p_->size() << endl;
+        std::memcpy(&swap_f_name_, &other.swap_f_name_, FNAME_LEN);
+    }
+
+    DataChunk(DataChunk &&other) noexcept
+        : swap_to_file_(other.swap_to_file_)
+        , is_p_(std::move(other.is_p_))
+        , data_sorted_p_(std::move(other.data_sorted_p_))
+    {
+        cerr << "DataChunk move Ctor. data size = " << data_sorted_p_->size() << endl;
+        std::memcpy(&swap_f_name_, &other.swap_f_name_, FNAME_LEN);
+    }
+
 #if 0
     ~DataChunk()
     {
@@ -77,7 +97,7 @@ public:
         }
     }
 #endif
-    auto begin()
+    auto begin() const
     {
         cerr << "begin(). swap = " << std::boolalpha << swap_to_file_ << endl;
         return swap_to_file_ ? IterSwitch<isIter<T>, decltype(data_sorted_p_->begin())>
@@ -85,7 +105,7 @@ public:
                              : IterSwitch<isIter<T>, decltype(data_sorted_p_->begin())>
                    (data_sorted_p_->begin());
     }
-    auto end()
+    auto end() const
     {
         cerr << "end(). swap = " << std::boolalpha << swap_to_file_ << endl;
         return swap_to_file_ ? IterSwitch<isIter<T>, decltype(data_sorted_p_->end())>

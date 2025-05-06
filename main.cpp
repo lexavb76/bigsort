@@ -32,10 +32,9 @@ int main()
     of.close();
     try {
         Manager<QuickSorter, FileDataSource> mng(input_src); //Choose sorting algorithm here
-
+        return mng.run();
     } catch (fs::filesystem_error &e) {
         cerr << e.what() << endl;
         return 1;
     }
-    return 0;
 }

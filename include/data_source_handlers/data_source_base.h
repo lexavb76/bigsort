@@ -22,26 +22,26 @@ template<typename Derived>
 class DataSourceBase
 {
 protected:
-    std::size_t size;
-    std::size_t chunk_size;
-    std::vector<DataChunk<>> d_chunk_vec;
+    std::size_t data_size_;
+    std::size_t chunk_size_;
+    std::vector<DataChunk<>> d_chunk_vec_;
 
 protected:
     DataSourceBase()  {} // Protected Ctor to avoid unexpected base class instantiation
     ~DataSourceBase() {} // Protected Dtor to avoid unexpected deletion through base class pointer
     std::size_t calculate_chunk_size()
     {
-        std::size_t chsize = (size > CHUNK_SIZE_MAX)? CHUNK_SIZE_MAX :
-                                 (size > CHUNK_SIZE_OPT)? CHUNK_SIZE_OPT : size;
+        std::size_t chsize = (data_size_ > CHUNK_SIZE_MAX)? CHUNK_SIZE_MAX :
+                                 (data_size_ > CHUNK_SIZE_OPT)? CHUNK_SIZE_OPT : data_size_;
         return chsize;
     }
 
 public:
     explicit DataSourceBase(std::size_t dsize)
-        : size(dsize)
+        : data_size_(dsize)
     {
-        chunk_size = calculate_chunk_size();
-        d_chunk_vec.reserve(size / chunk_size + 1);
+        chunk_size_ = calculate_chunk_size();
+        d_chunk_vec_.reserve(data_size_ / chunk_size_ + 1);
     }
 };
 

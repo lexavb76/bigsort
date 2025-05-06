@@ -18,14 +18,14 @@ class FileDataSource : public DataSourceBase<FileDataSource>
         std::string line;
         while (std::getline(is, line)) {
             size_acc += line.length() + 1;
-            if (size_acc > chunk_size) {
-                d_chunk_vec.emplace_back(tmp_chunk, swap_chunk_to_file);
+            if (size_acc > chunk_size_) {
+                d_chunk_vec_.emplace_back(tmp_chunk, swap_chunk_to_file);
                 tmp_chunk = dSortedContPtr<>(new dSortedContPtr<>::element_type);
                 size_acc = 0;
             }
             tmp_chunk->insert(line);
         }
-        d_chunk_vec.emplace_back(tmp_chunk, swap_chunk_to_file); // Store the last incomplete chunk
+        d_chunk_vec_.emplace_back(tmp_chunk, swap_chunk_to_file); // Store the last incomplete chunk
     }
 
 public:
@@ -34,19 +34,13 @@ public:
     {
         std::ifstream is(fname.data());
         cerr << fname << std::boolalpha << ' ' << is.fail() << endl;
-        cerr << "size = " << size << endl;
-        cerr << "chunk_size = " << chunk_size << endl;
+        cerr << "size = " << data_size_ << endl;
+        cerr << "chunk_size = " << chunk_size_ << endl;
         divide_to_chunks<>(is);
         is.close();
-        cerr << "number of chunks = " << d_chunk_vec.size() << endl;
-#if 1
-        for (auto &&chunk : d_chunk_vec) {
-            for (auto &&it : chunk) {
-//            for (auto &&it = chunk.begin(), &&end = chunk.end(); it != end; ++it) {
-                cout << it << endl;
-            }
-        }
-#endif
+        cerr << "number of chunks = " << d_chunk_vec_.size() << endl;
     }
+
+    [[ nodiscard("Return value discarded") ]] auto & get_d_chunk_vec() const & noexcept { return d_chunk_vec_; }
 };
 #endif // FILE_DATA_SOURCE_H
