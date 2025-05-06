@@ -6,8 +6,6 @@
 #include <ios>
 #include "data_source_base.h"
 
-using isIter = std::istream_iterator<std::string>;
-
 class FileDataSource : public DataSourceBase<FileDataSource>
 {
     template<typename InIter>
@@ -33,17 +31,19 @@ public:
         : DataSourceBase<FileDataSource>{fs::file_size(fname)}
     {
         std::ifstream is(fname.data());
-        auto is_begin = isIter(is);
-        auto is_end   = isIter();
+        auto is_begin = isIter<>(is);
+        auto is_end   = isIter<>();
         cerr << fname << std::boolalpha << ' ' << is.fail() << endl;
         cerr << "size = " << size << endl;
         cerr << "chunk_size = " << chunk_size << endl;
         divide_to_chunks(is_begin, is_end);
+        is.close();
         cerr << "number of chunks = " << d_chunk_vec.size() << endl;
 #if 1
         for (auto &&chunk : d_chunk_vec) {
             for (auto &&it : chunk) {
-                cout << it << endl;
+//            for (auto &&it = chunk.begin(), &&end = chunk.end(); it != end; ++it) {
+                cout << "Alex " << it << endl;
             }
         }
 #endif
