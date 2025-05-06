@@ -1,6 +1,7 @@
 #ifndef FILE_DATA_SOURCE_H
 #define FILE_DATA_SOURCE_H
 
+#include <string>
 #include <string_view>
 #include <fstream>
 #include <ios>
@@ -8,20 +9,21 @@
 
 class FileDataSource : public DataSourceBase<FileDataSource>
 {
-    template<typename InIter>
-    void divide_to_chunks(InIter first, const InIter &last)
+    template<typename T = std::string>
+    void divide_to_chunks(std::ifstream &is)
     {
         std::size_t size_acc = 0;
-        bool swap_chunk_to_file = true;
-        dSortedContPtr<> tmp_chunk(new dSortedContPtr<>::element_type);
-        for (; first != last; ++first) {
-            size_acc += first->length() + 1;
+        bool swap_chunk_to_file = false;
+        dSortedContPtr<T> tmp_chunk(new dSortedContPtr<>::element_type);
+        std::string line;
+        while (std::getline(is, line)) {
+            size_acc += line.length() + 1;
             if (size_acc > chunk_size) {
                 d_chunk_vec.emplace_back(tmp_chunk, swap_chunk_to_file);
                 tmp_chunk = dSortedContPtr<>(new dSortedContPtr<>::element_type);
                 size_acc = 0;
             }
-            tmp_chunk->insert(*first);
+            tmp_chunk->insert(line);
         }
         d_chunk_vec.emplace_back(tmp_chunk, swap_chunk_to_file); // Store the last incomplete chunk
     }
@@ -31,19 +33,17 @@ public:
         : DataSourceBase<FileDataSource>{fs::file_size(fname)}
     {
         std::ifstream is(fname.data());
-        auto is_begin = isIter<>(is);
-        auto is_end   = isIter<>();
         cerr << fname << std::boolalpha << ' ' << is.fail() << endl;
         cerr << "size = " << size << endl;
         cerr << "chunk_size = " << chunk_size << endl;
-        divide_to_chunks(is_begin, is_end);
+        divide_to_chunks<>(is);
         is.close();
         cerr << "number of chunks = " << d_chunk_vec.size() << endl;
 #if 1
         for (auto &&chunk : d_chunk_vec) {
             for (auto &&it : chunk) {
 //            for (auto &&it = chunk.begin(), &&end = chunk.end(); it != end; ++it) {
-                cout << "Alex " << it << endl;
+                cout << it << endl;
             }
         }
 #endif
