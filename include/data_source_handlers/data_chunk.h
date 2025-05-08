@@ -100,17 +100,17 @@ public:
     auto begin() const
     {
         cerr << "begin(). swap = " << std::boolalpha << swap_to_file_ << endl;
-        return swap_to_file_ ? IterSwitch<isIter<T>, decltype(data_sorted_p_->begin())>
-                   (isIter<T>(*is_p_))
-                             : IterSwitch<isIter<T>, decltype(data_sorted_p_->begin())>
+        return swap_to_file_ ? IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
+                   (*is_p_)
+                             : IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
                    (data_sorted_p_->begin());
     }
     auto end() const
     {
         cerr << "end(). swap = " << std::boolalpha << swap_to_file_ << endl;
-        return swap_to_file_ ? IterSwitch<isIter<T>, decltype(data_sorted_p_->end())>
-                   (isIter<T>())
-                             : IterSwitch<isIter<T>, decltype(data_sorted_p_->end())>
+        return swap_to_file_ ? IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
+                   (nullptr)
+                             : IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
                    (data_sorted_p_->end());
     }
 };

@@ -27,8 +27,9 @@ public:
         auto & chunk_vec = d_obj_.get_d_chunk_vec();
 #if 1
         for (auto &&chunk : chunk_vec) {
-            for (auto &&it : chunk) {
-                cout << it << endl;
+            cerr << "Print chunk" << endl;
+                        for (auto &&str : chunk) {
+                cout << str << endl;
             }
         }
 #endif
