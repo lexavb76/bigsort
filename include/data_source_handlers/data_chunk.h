@@ -23,22 +23,24 @@ namespace fs = std::filesystem;
 template<typename T = std::string, typename Compare = std::less<T>>
 using dSortedContPtr = std::shared_ptr<std::multiset<T, Compare>>; // Multiset keeps its data sorted
 
-//template<typename T = std::string>
-//using isIter = std::istream_iterator<T>;
-
 template<typename T = std::string>
 class DataChunk
 {
     constexpr static int FNAME_LEN = 18;
-    constexpr static int FEXT_LEN = 8;
+    constexpr static int FEXT_LEN = 12;
     bool swap_to_file_;
     char swap_f_name_[FNAME_LEN] = ".bigsort.tmp.xxxx";
-    std::shared_ptr<std::ifstream> is_p_ = nullptr;
-    dSortedContPtr<> data_sorted_p_;
+    std::unique_ptr<std::ifstream> is_p_ = nullptr;
+    dSortedContPtr<T> data_sorted_p_;
 
 public:
-    explicit DataChunk(dSortedContPtr<> data, bool swap_to_file = true)
-        : swap_to_file_(swap_to_file), data_sorted_p_(data)
+    DataChunk &operator=(const DataChunk &) = delete;
+    DataChunk &operator=(DataChunk &&)      = delete;
+    DataChunk() {}
+
+    explicit DataChunk(dSortedContPtr<T> data, bool swap_to_file = true)
+        : swap_to_file_(swap_to_file)
+        , data_sorted_p_(data)
     {
         if (swap_to_file && data_sorted_p_->size()) {
             // Generate unique tmp file name:
@@ -49,24 +51,19 @@ public:
                 swap_f_name_[i] = uf_dis(gen);
             }
             // ***
-            std::unique_ptr<std::ofstream> os_p = std::make_unique<std::ofstream>(
-                swap_f_name_); // Move tmp object as unique_ptr does not have copy Ctor
-            std::for_each(data_sorted_p_->begin(), data_sorted_p_->end(),
-                          [&os=os_p](const T &str) { (*os) << std::noskipws << str << endl; }
-                          );
+            std::unique_ptr<std::ofstream> os_p
+                = // Move tmp object as unique_ptr does not have copy Ctor
+                std::make_unique<std::ofstream>(swap_f_name_);
+            std::for_each(data_sorted_p_->begin(),
+                          data_sorted_p_->end(),
+                          [&os = os_p](const T &str) { (*os) << std::noskipws << str << endl; });
             os_p->close();
             if (!fs::exists(swap_f_name_))
-                throw(fs::filesystem_error((std::stringstream{} << "File '" << swap_f_name_ << "' was not created.").str(),
+                throw(fs::filesystem_error((std::stringstream{} << "File '" << swap_f_name_
+                                                                << "' was not created.").str(),
                                            std::make_error_code(std::errc::io_error)));
             data_sorted_p_->clear();
-            is_p_ = std::make_unique<std::ifstream>(
-                swap_f_name_); // Move tmp object as unique_ptr does not have copy Ctor
-#if 0
-            for (auto &&it = begin(), &&end = this->end(); it != end; ++it) {
-//            for (auto &&it = isIter<T>(*is_p_), &&end = isIter<T>(); it != end; ++it) {
-                cout << "Alex " << *it << endl;
-            }
-#endif
+            is_p_ = std::make_unique<std::ifstream>(swap_f_name_);
         }
     }
 
@@ -88,15 +85,12 @@ public:
         std::memcpy(&swap_f_name_, &other.swap_f_name_, FNAME_LEN);
     }
 
-#if 0
     ~DataChunk()
     {
-        if (is_p_) {
-            cerr << "DataChunk Dtor. data size = " << data_sorted_p_->size() << endl;
-            is_p_->close();
-        }
+        cerr << "DataChunk Dtor. data size = " << data_sorted_p_->size() << endl;
+        if (is_p_) is_p_->close();
     }
-#endif
+
     auto begin() const
     {
         cerr << "begin(). swap = " << std::boolalpha << swap_to_file_ << endl;

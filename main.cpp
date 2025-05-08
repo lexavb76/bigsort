@@ -29,21 +29,6 @@ int main()
         of << std::noskipws << std::hex << std::setw(1) << std::setfill('0') << uf_dis(gen)<< "    Alex!!!" << endl;
     }
     of.close();
-#if 0
-    std::ifstream is(input_src);
-    auto is_it_end = std::istream_iterator<std::string>();
-    auto is_it_beg = is_it_end;
-    std::string str;
-    for (int i = 0; i < 10; ++i) {
-        std::getline(is, str);
-        cerr << str << " ---> getline 1" << endl;
-        is_it_beg = std::istream_iterator<std::string>(is);
-        cerr << *is_it_beg << " ---> iterator" << endl;
-        auto _ = *++is_it_beg;
-        std::getline(is, str);
-        cerr << str << " ---> getline 2" << endl;
-    }
-#endif
     try {
         Manager<QuickSorter, FileDataSource> mng(input_src); //Choose sorting algorithm here
         return mng.run();

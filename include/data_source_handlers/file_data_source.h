@@ -14,18 +14,18 @@ class FileDataSource : public DataSourceBase<FileDataSource>
     {
         std::size_t size_acc = 0;
         bool swap_chunk_to_file = false;
-        dSortedContPtr<T> tmp_chunk(new dSortedContPtr<>::element_type);
+        dSortedContPtr<T> tmp_chunk_p(new dSortedContPtr<>::element_type);
         std::string line;
         while (std::getline(is, line)) {
             size_acc += line.length() + 1;
             if (size_acc > chunk_size_) {
-                d_chunk_vec_.emplace_back(tmp_chunk, swap_chunk_to_file);
-                tmp_chunk = dSortedContPtr<>(new dSortedContPtr<>::element_type);
+                d_chunk_vec_.emplace_back(tmp_chunk_p, swap_chunk_to_file);
+                tmp_chunk_p = dSortedContPtr<T>(new dSortedContPtr<T>::element_type);
                 size_acc = 0;
             }
-            tmp_chunk->insert(line);
+            tmp_chunk_p->insert(line);
         }
-        d_chunk_vec_.emplace_back(tmp_chunk, swap_chunk_to_file); // Store the last incomplete chunk
+        d_chunk_vec_.emplace_back(tmp_chunk_p, swap_chunk_to_file); // Store the last incomplete chunk
     }
 
 public:
