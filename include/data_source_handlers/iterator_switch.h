@@ -9,10 +9,6 @@
 #include <memory>
 #include <string>
 
-using std::cout;
-using std::cerr;
-using std::endl;
-
 /**
  * @brief The IterSwitch class
  * As std::istream_iterator<std::string> treats whitespaces as a delimiter also,
@@ -44,7 +40,7 @@ private:
     std::shared_ptr<isIter<>> it_curr_p_ = nullptr;
     std::shared_ptr<isIter<>> it_prev_p_ = nullptr;
     std::shared_ptr<U>        it_sec_p_  = nullptr;
-    istream_type             *is_p_      = nullptr;
+    istream_type             *is_p_      = nullptr; // Never delete here, just use
     value_type                value_curr_;
 
 public:
@@ -71,20 +67,26 @@ public:
         it_sec_p_ = std::make_shared<U>(it);
     }
 
-    IterSwitch(const IterSwitch &) { cerr << "IterSwich Copy Ctor." << endl; }
+    IterSwitch(const IterSwitch &other)
+        : it_curr_p_(other.it_curr_p_)
+        , it_prev_p_(other.it_prev_p_)
+        , it_sec_p_(other.it_sec_p_)
+        , is_p_(other.is_p_)
+        , value_curr_(other.value_curr_)
+    { /* cerr << "IterSwich Copy Ctor." << endl; */ }
 
-    IterSwitch(IterSwitch &&other)
+    IterSwitch(IterSwitch &&other) noexcept
         : IterSwitch(other)
     {
-        cerr << "IterSwich Move Ctor." << endl;
+        // cerr << "IterSwich Move Ctor." << endl;
     }
 
-    ~IterSwitch() { cerr << "IterSwich Dtor." << endl; }
+    ~IterSwitch() { /* cerr << "IterSwich Dtor." << endl; */ }
 
     decltype(auto) operator->() const { return it_curr_p_ ? (*it_curr_p_) : (*it_sec_p_); }
     bool operator==(const IterSwitch &other) const
     {
-        // cerr << "Operator ==" << endl;
+        // cerr << "Operator == " << endl;
         return it_prev_p_ ? (*it_prev_p_ == *other.it_prev_p_) : (*it_sec_p_ == *other.it_sec_p_);
     }
     bool operator!=(const IterSwitch &other) const { return !(*this == other); }

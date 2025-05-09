@@ -4,15 +4,13 @@
 #include <cstddef>
 #include <vector>
 #include "data_chunk.h"
+#include "types.h"
 
 class ISortedCont
 {
 public:
     virtual ~ISortedCont() {}
 };
-
-constexpr std::size_t CHUNK_SIZE_MAX = 1024 * 1024 * 100;
-constexpr std::size_t CHUNK_SIZE_OPT = 16 * 16 * 4 * 3;
 
 /**
  * @brief The IDataSource class.
@@ -21,10 +19,13 @@ constexpr std::size_t CHUNK_SIZE_OPT = 16 * 16 * 4 * 3;
 template<typename Derived>
 class DataSourceBase
 {
+public:
+    using containerType = std::vector<DataChunk<>>;
+
 protected:
     std::size_t data_size_;
     std::size_t chunk_size_;
-    std::vector<DataChunk<>> d_chunk_vec_;
+    containerType d_chunk_vec_;
 
 protected:
     DataSourceBase()  {} // Protected Ctor to avoid unexpected base class instantiation
@@ -43,6 +44,9 @@ public:
         chunk_size_ = calculate_chunk_size();
         d_chunk_vec_.reserve(data_size_ / chunk_size_ + 1);
     }
+
+    [[ nodiscard("Return value discarded") ]]
+    containerType const & get_d_chunk_vec() const noexcept { return Derived::get_d_chunk_vec(); }
 };
 
 #endif // DATA_SOURCE_BASE_H

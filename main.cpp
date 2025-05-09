@@ -1,3 +1,4 @@
+#include "file_data_source.h"
 #include "manager.h"
 #include "isorter.h"
 #include <cstddef>
@@ -30,7 +31,7 @@ int main()
     }
     of.close();
     try {
-        Manager<QuickSorter, FileDataSource> mng(input_src); //Choose sorting algorithm here
+        Manager<QuickSorter<FileDataSource>, FileDataSource> mng(input_src); //Choose sorting algorithm here
         return mng.run();
     } catch (fs::filesystem_error &e) {
         cerr << e.what() << endl;

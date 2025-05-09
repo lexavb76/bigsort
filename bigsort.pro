@@ -16,7 +16,8 @@ HEADERS += \
     include/data_source_handlers/file_data_source.h \
     include/data_source_handlers/iterator_switch.h \
     include/manager.h \
-    include/sorters/isorter.h
+    include/sorters/isorter.h \
+    include/types.h
 
 DISTFILES += \
     .gitignore \

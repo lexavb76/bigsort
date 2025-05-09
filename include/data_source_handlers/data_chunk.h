@@ -3,29 +3,22 @@
 #include <cstring>
 #include <random>
 #include <sstream>
-#include <algorithm>
 #include <filesystem>
+#include <algorithm>
 #include <fstream>
 #include <ios>
 #include <system_error>
-#include <memory>
-#include <set>
-#include <iostream>
-#include <string>
 #include "iterator_switch.h"
-
-using std::cout;
-using std::cerr;
-using std::endl;
+#include "types.h"
 
 namespace fs = std::filesystem;
-
-template<typename T = std::string, typename Compare = std::less<T>>
-using dSortedContPtr = std::shared_ptr<std::multiset<T, Compare>>; // Multiset keeps its data sorted
 
 template<typename T = std::string>
 class DataChunk
 {
+public:
+    using element_type = T;
+
     constexpr static int FNAME_LEN = 18;
     constexpr static int FEXT_LEN = 12;
     bool swap_to_file_;
@@ -72,7 +65,7 @@ public:
         , is_p_(other.is_p_)
         , data_sorted_p_(other.data_sorted_p_)
     {
-        cerr << "DataChunk copy Ctor. data size = " << data_sorted_p_->size() << endl;
+        // cerr << "DataChunk copy Ctor. data size = " << data_sorted_p_->size() << endl;
         std::memcpy(&swap_f_name_, &other.swap_f_name_, FNAME_LEN);
     }
 
@@ -81,19 +74,19 @@ public:
         , is_p_(std::move(other.is_p_))
         , data_sorted_p_(std::move(other.data_sorted_p_))
     {
-        cerr << "DataChunk move Ctor. data size = " << data_sorted_p_->size() << endl;
+        // cerr << "DataChunk move Ctor. data size = " << data_sorted_p_->size() << endl;
         std::memcpy(&swap_f_name_, &other.swap_f_name_, FNAME_LEN);
     }
 
     ~DataChunk()
     {
-        cerr << "DataChunk Dtor. data size = " << data_sorted_p_->size() << endl;
+        // cerr << "DataChunk Dtor. data size = " << data_sorted_p_->size() << endl;
         if (is_p_) is_p_->close();
     }
 
     auto begin() const
     {
-        cerr << "begin(). swap = " << std::boolalpha << swap_to_file_ << endl;
+        // cerr << "begin(). swap = " << std::boolalpha << swap_to_file_ << endl;
         return swap_to_file_ ? IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
                    (*is_p_)
                              : IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
@@ -101,7 +94,7 @@ public:
     }
     auto end() const
     {
-        cerr << "end(). swap = " << std::boolalpha << swap_to_file_ << endl;
+        // cerr << "end(). swap = " << std::boolalpha << swap_to_file_ << endl;
         return swap_to_file_ ? IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
                    (nullptr)
                              : IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
