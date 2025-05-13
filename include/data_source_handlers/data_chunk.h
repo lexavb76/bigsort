@@ -60,7 +60,7 @@ public:
         }
     }
 
-    DataChunk(const DataChunk &other)
+    DataChunk(const DataChunk &other) noexcept(noexcept(std::memcpy))
         : swap_to_file_(other.swap_to_file_)
         , is_p_(other.is_p_)
         , data_sorted_p_(other.data_sorted_p_)
@@ -69,7 +69,7 @@ public:
         std::memcpy(&swap_f_name_, &other.swap_f_name_, FNAME_LEN);
     }
 
-    DataChunk(DataChunk &&other) noexcept
+    DataChunk(DataChunk &&other) noexcept(noexcept(std::memcpy))
         : swap_to_file_(other.swap_to_file_)
         , is_p_(std::move(other.is_p_))
         , data_sorted_p_(std::move(other.data_sorted_p_))

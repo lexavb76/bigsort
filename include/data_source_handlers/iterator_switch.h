@@ -67,13 +67,17 @@ public:
         it_sec_p_ = std::make_shared<U>(it);
     }
 
-    IterSwitch(const IterSwitch &other)
-        : it_curr_p_(other.it_curr_p_)
-        , it_prev_p_(other.it_prev_p_)
-        , it_sec_p_(other.it_sec_p_)
-        , is_p_(other.is_p_)
+    IterSwitch(const IterSwitch &other) noexcept
+#if 1
+        = default; // Copy initialization as for aggregates
+#else // Just empty Ctor {} does default initialization
+        : it_curr_p_ (other.it_curr_p_)
+        , it_prev_p_ (other.it_prev_p_)
+        , it_sec_p_  (other.it_sec_p_)
+        , is_p_      (other.is_p_)
         , value_curr_(other.value_curr_)
     { /* cerr << "IterSwich Copy Ctor." << endl; */ }
+#endif
 
     IterSwitch(IterSwitch &&other) noexcept
         : IterSwitch(other)
@@ -84,7 +88,7 @@ public:
     ~IterSwitch() { /* cerr << "IterSwich Dtor." << endl; */ }
 
     decltype(auto) operator->() const { return it_curr_p_ ? (*it_curr_p_) : (*it_sec_p_); }
-    bool operator==(const IterSwitch &other) const
+    bool operator==(const IterSwitch &other) const noexcept
     {
         // cerr << "Operator == " << endl;
         return it_prev_p_ ? (*it_prev_p_ == *other.it_prev_p_) : (*it_sec_p_ == *other.it_sec_p_);
@@ -98,10 +102,11 @@ public:
             it_prev_p_ = std::make_shared<isIter<>>(*it_curr_p_); //Deep copy of the iterator
             std::string str;
             std::getline(*is_p_, str);
-            value_curr_ = **it_curr_p_ + str; // Take the first value, eaten by the iterator when initialized
+            auto value_tmp = **it_curr_p_ + str; // For strict exception guarantee
             // cerr << **it_curr_p_ << " ---> iterator = " << std::hex << it_curr_p_ << endl;
-            // cerr << str << " ---> getline" << endl;
             it_curr_p_ = std::make_shared<isIter<>>(*is_p_); //Points to the current position in file
+            std::swap(value_tmp, value_curr_); // Take the first value, eaten by the iterator when initialized
+            // cerr << str << " ---> getline" << endl;
         } else
             ++(*it_sec_p_);
         return *this;

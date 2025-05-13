@@ -4,7 +4,6 @@
 #include <string>
 #include <string_view>
 #include <fstream>
-#include <ios>
 #include "data_source_base.h"
 
 class FileDataSource : public DataSourceBase<FileDataSource>
@@ -13,7 +12,7 @@ class FileDataSource : public DataSourceBase<FileDataSource>
     void divide_to_chunks(std::ifstream &is)
     {
         std::size_t size_acc = 0;
-        bool swap_chunk_to_file = true;
+        bool swap_chunk_to_file = false;
         dSortedContPtr<T> tmp_chunk_p(new dSortedContPtr<>::element_type);
         std::string line;
         while (std::getline(is, line)) {
