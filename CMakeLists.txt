@@ -4,6 +4,7 @@ project(bigsort LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS -save-temps)
 
 set(INCLUDE_DIRS "include/" "include/sorters/" "include/data_source_handlers/")
 set(SOURCES main.cpp)

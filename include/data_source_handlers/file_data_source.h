@@ -9,7 +9,7 @@
 class FileDataSource : public DataSourceBase<FileDataSource>
 {
     template<typename T = std::string>
-    void divide_to_chunks(std::ifstream &is)
+    void divide_to_chunks(std::istream &is)
     {
         std::size_t size_acc = 0;
         bool swap_chunk_to_file = false;
@@ -37,6 +37,16 @@ public:
         // cerr << "chunk_size = " << chunk_size_ << endl;
         divide_to_chunks<>(is);
         is.close();
+        // cerr << "number of chunks = " << d_chunk_vec_.size() << endl;
+    }
+
+    explicit inline FileDataSource(std::istream &is)
+        : DataSourceBase<FileDataSource>{}
+    {
+        // cerr << fname << std::boolalpha << ' ' << is.fail() << endl;
+        // cerr << "size = " << data_size_ << endl;
+        // cerr << "chunk_size = " << chunk_size_ << endl;
+        divide_to_chunks<>(is);
         // cerr << "number of chunks = " << d_chunk_vec_.size() << endl;
     }
 

@@ -2,7 +2,6 @@
 #include "manager.h"
 #include "isorter.h"
 #include <cstddef>
-#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <ios>
@@ -17,6 +16,7 @@ using dataType = unsigned long long;
 
 int main()
 {
+#if 0
     std::random_device seed;
     std::mt19937 gen(seed());
     //    std::uniform_int_distribution<dataType> uf_dis(0, static_cast<dataType>(gen.max()));
@@ -30,11 +30,10 @@ int main()
         of << std::noskipws << std::hex << std::setw(1) << std::setfill('0') << uf_dis(gen)<< "    Alex!!!" << endl;
     }
     of.close();
-    try {
-        Manager<QuickSorter<FileDataSource>, FileDataSource> mng(input_src); //Choose sorting algorithm here
-        return mng.run();
-    } catch (fs::filesystem_error &e) {
-        cerr << e.what() << endl;
-        return 1;
-    }
+    std::ifstream is(input_src);
+#else
+    auto &is = std::cin;
+#endif
+    Manager<QuickSorter<FileDataSource>, FileDataSource> mng{is}; //Choose sorting algorithm here
+    return mng.run();
 }

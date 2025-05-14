@@ -23,7 +23,7 @@ public:
     using containerType = std::vector<DataChunk<>>;
 
 protected:
-    std::size_t data_size_;
+    std::size_t data_size_ = CHUNK_SIZE_OPT;
     std::size_t chunk_size_;
     containerType d_chunk_vec_;
 

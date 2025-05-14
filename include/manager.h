@@ -8,17 +8,19 @@ template<class Sorter,
          class Data = FileDataSource>
 class Manager
 {
-    const char *src_name_;
+    const char *src_name_ = nullptr;
     Data d_obj_;
     std::unique_ptr<Sorter> sorter_p_;
 
 public:
-    Manager(const char *src)
+    explicit Manager(std::istream &is)
+      : d_obj_(is)
+    {}
+
+    explicit Manager(const char *src)
       : src_name_(src),
         d_obj_(src_name_)
-    {
-        // std::cerr << "Manager default ctor" << std::endl;
-    }
+    {}
 
     int run()
     {
