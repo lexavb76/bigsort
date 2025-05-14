@@ -23,7 +23,7 @@ int main()
     auto data_max = std::numeric_limits<dataType>::max();
     std::uniform_int_distribution<dataType> uf_dis(0, data_max);
     std::ofstream of(input_src);
-    cerr << uf_dis.min() << " - " << uf_dis.max() << endl;
+    clog << uf_dis.min() << " - " << uf_dis.max() << endl;
 
     for (std::size_t i = 1; i < INPUT_LINES_NUM + 1; ++i) {
 //        of << std::noskipws << std::hex << std::setw(1) << std::setfill('0') << uf_dis(gen) << endl;

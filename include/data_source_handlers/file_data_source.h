@@ -32,22 +32,20 @@ public:
         : DataSourceBase<FileDataSource>{fs::file_size(fname)}
     {
         std::ifstream is(fname.data());
-        // cerr << fname << std::boolalpha << ' ' << is.fail() << endl;
-        // cerr << "size = " << data_size_ << endl;
-        // cerr << "chunk_size = " << chunk_size_ << endl;
+        // clog << "size = " << data_size_ << endl;
+        // clog << "chunk_size = " << chunk_size_ << endl;
         divide_to_chunks<>(is);
         is.close();
-        // cerr << "number of chunks = " << d_chunk_vec_.size() << endl;
+        // clog << "number of chunks = " << d_chunk_vec_.size() << endl;
     }
 
     explicit inline FileDataSource(std::istream &is)
         : DataSourceBase<FileDataSource>{}
     {
-        // cerr << fname << std::boolalpha << ' ' << is.fail() << endl;
-        // cerr << "size = " << data_size_ << endl;
-        // cerr << "chunk_size = " << chunk_size_ << endl;
+        clog << "size = " << data_size_ << endl;
+        clog << "chunk_size = " << chunk_size_ << endl;
         divide_to_chunks<>(is);
-        // cerr << "number of chunks = " << d_chunk_vec_.size() << endl;
+        clog << "number of chunks = " << d_chunk_vec_.size() << endl;
     }
 
     [[ nodiscard("Return value discarded") ]]

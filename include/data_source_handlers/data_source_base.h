@@ -23,12 +23,14 @@ public:
     using containerType = std::vector<DataChunk<>>;
 
 protected:
-    std::size_t data_size_ = CHUNK_SIZE_OPT;
-    std::size_t chunk_size_;
+    std::size_t data_size_ = CHUNK_SIZE_MAX;
+    std::size_t chunk_size_ = CHUNK_SIZE_OPT;
     containerType d_chunk_vec_;
 
 protected:
-    DataSourceBase()  {} // Protected Ctor to avoid unexpected base class instantiation
+    DataSourceBase() // Protected Ctor to avoid unexpected base class instantiation
+    {}
+
     ~DataSourceBase() {} // Protected Dtor to avoid unexpected deletion through base class pointer
     std::size_t calculate_chunk_size()
     {

@@ -51,19 +51,19 @@ public:
     explicit IterSwitch(T &is)
         : is_p_(&is)
     {
-        // cerr << "IterSwich Ctor. ifstream. Begin" << endl;
+        // clog << "IterSwich Ctor. ifstream. Begin" << endl;
         it_prev_p_ = it_curr_p_ = std::make_shared<isIter<>>(is);
     }
 
     explicit IterSwitch(std::nullptr_t) // Is end iterator
     {
-        // cerr << "IterSwich Ctor. ifstream. End" << endl;
+        // clog << "IterSwich Ctor. ifstream. End" << endl;
         it_prev_p_ = it_curr_p_ = std::make_shared<isIter<>>();
     }
 
     explicit IterSwitch(U it)
     {
-        // cerr << "IterSwich Ctor. multimap. " << endl;
+        // clog << "IterSwich Ctor. multimap. " << endl;
         it_sec_p_ = std::make_shared<U>(it);
     }
 
@@ -76,37 +76,37 @@ public:
         , it_sec_p_  (other.it_sec_p_)
         , is_p_      (other.is_p_)
         , value_curr_(other.value_curr_)
-    { /* cerr << "IterSwich Copy Ctor." << endl; */ }
+    { /* clog << "IterSwich Copy Ctor." << endl; */ }
 #endif
 
     IterSwitch(IterSwitch &&other) noexcept
         : IterSwitch(other)
     {
-        // cerr << "IterSwich Move Ctor." << endl;
+        // clog << "IterSwich Move Ctor." << endl;
     }
 
-    ~IterSwitch() { /* cerr << "IterSwich Dtor." << endl; */ }
+    ~IterSwitch() { /* clog << "IterSwich Dtor." << endl; */ }
 
     decltype(auto) operator->() const { return it_curr_p_ ? (*it_curr_p_) : (*it_sec_p_); }
     bool operator==(const IterSwitch &other) const noexcept
     {
-        // cerr << "Operator == " << endl;
+        // clog << "Operator == " << endl;
         return it_prev_p_ ? (*it_prev_p_ == *other.it_prev_p_) : (*it_sec_p_ == *other.it_sec_p_);
     }
     bool operator!=(const IterSwitch &other) const { return !(*this == other); }
 
     IterSwitch &operator++()
     {
-        // cerr << "Operator ++" << "; this = " << this << endl;
+        // clog << "Operator ++" << "; this = " << this << endl;
         if (it_curr_p_) {
             it_prev_p_ = std::make_shared<isIter<>>(*it_curr_p_); //Deep copy of the iterator
             std::string str;
             std::getline(*is_p_, str);
             auto value_tmp = **it_curr_p_ + str; // For strict exception guarantee
-            // cerr << **it_curr_p_ << " ---> iterator = " << std::hex << it_curr_p_ << endl;
+            // clog << **it_curr_p_ << " ---> iterator = " << std::hex << it_curr_p_ << endl;
             it_curr_p_ = std::make_shared<isIter<>>(*is_p_); //Points to the current position in file
             std::swap(value_tmp, value_curr_); // Take the first value, eaten by the iterator when initialized
-            // cerr << str << " ---> getline" << endl;
+            // clog << str << " ---> getline" << endl;
         } else
             ++(*it_sec_p_);
         return *this;
@@ -121,13 +121,13 @@ public:
 
     value_type operator*()
     {
-        // cerr << "Operator *" << " ---> iterator = " << std::hex << it_curr_p_ << "; this = " << this << endl;
+        // clog << "Operator *" << " ---> iterator = " << std::hex << it_curr_p_ << "; this = " << this << endl;
         if (it_curr_p_) {
             if (value_curr_.empty())
                 ++(*this); // The first iteration. Step forward to read the first value from iterator.
             return value_curr_;
         }
-        // cerr << "Operator *. Multimap" << endl;
+        // clog << "Operator *. Multimap" << endl;
         return static_cast<value_type>( *(*it_sec_p_));
     }
 };

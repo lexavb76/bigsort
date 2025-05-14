@@ -7,10 +7,11 @@
 #include <string>
 
 constexpr std::size_t CHUNK_SIZE_MAX = 1024 * 1024 * 100;
-constexpr std::size_t CHUNK_SIZE_OPT = 16 * 16 * 4 * 3;
+// constexpr std::size_t CHUNK_SIZE_OPT = 16 * 16 * 4 * 3;
+constexpr std::size_t CHUNK_SIZE_OPT = CHUNK_SIZE_MAX / 10000;
 
 using std::cout;
-using std::cerr;
+using std::clog;
 using std::endl;
 
 template<typename T = std::string, typename Compare = std::less<T>>

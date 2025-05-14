@@ -65,7 +65,7 @@ public:
         , is_p_(other.is_p_)
         , data_sorted_p_(other.data_sorted_p_)
     {
-        // cerr << "DataChunk copy Ctor. data size = " << data_sorted_p_->size() << endl;
+        // clog << "DataChunk copy Ctor. data size = " << data_sorted_p_->size() << endl;
         std::memcpy(&swap_f_name_, &other.swap_f_name_, FNAME_LEN);
     }
 
@@ -74,19 +74,19 @@ public:
         , is_p_(std::move(other.is_p_))
         , data_sorted_p_(std::move(other.data_sorted_p_))
     {
-        // cerr << "DataChunk move Ctor. data size = " << data_sorted_p_->size() << endl;
+        // clog << "DataChunk move Ctor. data size = " << data_sorted_p_->size() << endl;
         std::memcpy(&swap_f_name_, &other.swap_f_name_, FNAME_LEN);
     }
 
     ~DataChunk()
     {
-        // cerr << "DataChunk Dtor. data size = " << data_sorted_p_->size() << endl;
+        // clog << "DataChunk Dtor. data size = " << data_sorted_p_->size() << endl;
         if (is_p_) is_p_->close();
     }
 
     auto begin() const
     {
-        // cerr << "begin(). swap = " << std::boolalpha << swap_to_file_ << endl;
+        // clog << "begin(). swap = " << std::boolalpha << swap_to_file_ << endl;
         return swap_to_file_ ? IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
                    (*is_p_)
                              : IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
@@ -94,7 +94,7 @@ public:
     }
     auto end() const
     {
-        // cerr << "end(). swap = " << std::boolalpha << swap_to_file_ << endl;
+        // clog << "end(). swap = " << std::boolalpha << swap_to_file_ << endl;
         return swap_to_file_ ? IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
                    (nullptr)
                              : IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>

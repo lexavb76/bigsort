@@ -36,7 +36,7 @@ class QuickSorter : public iSorterType
     iSorterType::mode_e mode_;
 
 public:
-    inline QuickSorter() { /* std::cerr << "QSorter default ctor" << std::endl; */ }
+    inline QuickSorter() { /* std::clog << "QSorter default ctor" << std::endl; */ }
     QuickSorter(const QuickSorter &)            = default;
     QuickSorter(QuickSorter &&)                 = delete;
     QuickSorter &operator=(const QuickSorter &) = delete;
@@ -57,7 +57,7 @@ public:
         iters_end.reserve(chunks_num);
         if (mode_ == iSorterType::MODE_MERGE_ONLY) {
             for (auto &&chunk : chunks_) { // Get iterators for all chunks
-                // cerr << "==========================================================================" << endl;
+                // clog << "==========================================================================" << endl;
                 iters_beg.push_back(chunk.begin());
                 iters_end.push_back(chunk.end());
             }
@@ -71,10 +71,10 @@ public:
                         touch = true;
                     }
                 }
-            }
-
-            for (auto && val : cont_tmp) {
-                cout << val << endl;
+                for (auto &&val : cont_tmp) {
+                    cout << val << endl;
+                }
+                cont_tmp.clear();
             }
         }
     }

@@ -29,7 +29,7 @@ public:
 #if 0
         auto & chunk_vec = d_obj_.get_d_chunk_vec();
         for (auto &&chunk : chunk_vec) {
-            cerr << "Print chunk" << endl;
+            clog << "Print chunk" << endl;
             for (auto &&str : chunk) {
             cout << str << endl;
         }
@@ -37,7 +37,7 @@ public:
 #endif
 #if 0
         for (auto &&chunk : chunk_vec) {
-            cerr << "Print chunk" << endl;
+            clog << "Print chunk" << endl;
             for (auto &&i = chunk.begin(), end = chunk.end(); i != end; ++i)
             cout << *i << endl;
     }
