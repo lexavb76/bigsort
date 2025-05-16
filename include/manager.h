@@ -42,7 +42,7 @@ public:
             cout << *i << endl;
     }
 #endif
-        sorter_p_->print();
+        sorter_p_->sorted_print();
         return 0;
     }
 };

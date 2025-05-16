@@ -2,7 +2,7 @@
 #define DATA_SOURCE_BASE_H
 
 #include <cstddef>
-#include <vector>
+#include <deque>
 #include "data_chunk.h"
 #include "types.h"
 
@@ -20,7 +20,8 @@ template<typename Derived>
 class DataSourceBase
 {
 public:
-    using containerType = std::vector<DataChunk<>>;
+    // using containerType = std::vector<DataChunk<>>;
+    using containerType = std::deque<DataChunk<>>;
 
 protected:
     std::size_t data_size_ = CHUNK_SIZE_MAX;
@@ -44,7 +45,7 @@ public:
         : data_size_(dsize)
     {
         chunk_size_ = calculate_chunk_size();
-        d_chunk_vec_.reserve(data_size_ / chunk_size_ + 1);
+        // d_chunk_vec_.reserve(data_size_ / chunk_size_ + 1);
     }
 
     [[ nodiscard("Return value discarded") ]]

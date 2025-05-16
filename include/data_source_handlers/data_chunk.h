@@ -17,14 +17,15 @@ template<typename T = std::string>
 class DataChunk
 {
 public:
-    using element_type = T;
-
     constexpr static int FNAME_LEN = 18;
     constexpr static int FEXT_LEN = 12;
     bool swap_to_file_;
     char swap_f_name_[FNAME_LEN] = ".bigsort.tmp.xxxx";
     std::unique_ptr<std::ifstream> is_p_ = nullptr;
     dSortedContPtr<T> data_sorted_p_;
+
+    using value_type = T;
+    using iterator_type = IterSwitch <std::ifstream, decltype(data_sorted_p_->begin())>;
 
 public:
     DataChunk &operator=(const DataChunk &) = delete;
@@ -87,17 +88,17 @@ public:
     auto begin() const
     {
         // clog << "begin(). swap = " << std::boolalpha << swap_to_file_ << endl;
-        return swap_to_file_ ? IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
+        return swap_to_file_ ? iterator_type
                    (*is_p_)
-                             : IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
+                             : iterator_type
                    (data_sorted_p_->begin());
     }
     auto end() const
     {
         // clog << "end(). swap = " << std::boolalpha << swap_to_file_ << endl;
-        return swap_to_file_ ? IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
+        return swap_to_file_ ? iterator_type
                    (nullptr)
-                             : IterSwitch<std::ifstream, decltype(data_sorted_p_->begin())>
+                             : iterator_type
                    (data_sorted_p_->end());
     }
 };
